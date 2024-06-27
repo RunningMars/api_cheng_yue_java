@@ -64,7 +64,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.22</version> <!-- 使用最新的稳定版本 -->
+            <version>8.0.11</version>
         </dependency>
 
         <!--3.mybatis-plus  版本很重要3.0.5-->
