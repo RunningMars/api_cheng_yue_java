@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cheng.api.mapper.ChatRoomMemberMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cheng.api.entity.ChatRoomMember">
+        <id column="id" property="id" />
+        <result column="chat_room_id" property="chatRoomId" />
+        <result column="member_id" property="memberId" />
+        <result column="is_new_to_read" property="isNewToRead" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Chat_Room_Member_Base_Column_List">
+        id, chat_room_id, member_id, is_new_to_read, created_at, updated_at
+    </sql>
+
+    <select id="selectChatRoomMember" parameterType="map" resultMap="BaseResultMap2">
+        select
+            crm.*,
+            m. *
+        from chat_room_member as crm
+        join member as m on crm.member_id = m.id
+        where crm.chat_room_id in
+            <foreach item="id" index="index" collection="chatRoomIds" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+            AND crm.member_id != #{memberId}
+    </select>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap2" type="com.cheng.api.dto.ChatRoomMemberDto">
+        <id column="id" property="id" />
+        <result column="chat_room_id" property="chatRoomId" />
+        <result column="member_id" property="memberId" />
+        <result column="is_new_to_read" property="isNewToRead" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+        <association property="member" column="member_id" javaType="com.cheng.api.vo.MemberVo">
+            <result column="member_id" property="id" jdbcType="INTEGER"/>
+            <result column="nick_name" property="nickName" jdbcType="VARCHAR"/>
+            <result column="profile_photo" property="profilePhoto" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+
+    <select id="selectChatRoomMeMember" parameterType="map" resultMap="BaseResultMap3">
+        select
+            crm.*,
+            m. *
+        from chat_room_member as crm
+        join member as m on crm.member_id = m.id
+        where crm.chat_room_id in
+            <foreach item="id" index="index" collection="chatRoomIds" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+            AND crm.member_id = #{memberId}
+    </select>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap3" type="com.cheng.api.entity.ChatRoomMember">
+        <id column="id" property="id" />
+        <result column="chat_room_id" property="chatRoomId" />
+        <result column="member_id" property="memberId" />
+        <result column="is_new_to_read" property="isNewToRead" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cheng.api.mapper.MemberThumbsUpMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cheng.api.entity.MemberThumbsUp">
+        <id column="id" property="id" />
+        <result column="member_id" property="memberId" />
+        <result column="to_member_id" property="toMemberId" />
+        <result column="is_thumbs_up" property="isThumbsUp" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+
+    <select id="searchThumbsUpList" parameterType="map" resultMap="BaseResultMap1">
+        select
+        member_thumbs_up.*,
+        m.profile_photo,
+        m.nick_name
+        from member_thumbs_up
+        join member as m on member_thumbs_up.member_id = m.id
+        where member_thumbs_up.to_member_id = #{currentMemberId}
+        <if test="keyWord != null">
+            and m.nick_name like concat("%",#{keyWord},"%")
+        </if>
+    </select>
+
+    <resultMap id="BaseResultMap1" type="com.cheng.api.dto.MemberThumbsUpDto">
+        <id column="id" property="id" />
+        <result column="member_id" property="memberId" />
+        <result column="to_member_id" property="toMemberId" />
+        <result column="is_thumbs_up" property="isThumbsUp" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+        <association property="member" column="member_id" javaType="com.cheng.api.vo.MemberVo">
+            <result column="member_id" property="id" jdbcType="INTEGER"/>
+            <result column="nick_name" property="nickName" jdbcType="VARCHAR"/>
+            <result column="profile_photo" property="profilePhoto" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+
+
+</mapper>

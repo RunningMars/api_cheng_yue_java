@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cheng.api.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cheng.api.entity.User">
+        <id column="id" property="id" />
+        <result column="mobile" property="mobile" />
+        <result column="email" property="email" />
+        <result column="name" property="name" />
+        <result column="email_verified_at" property="emailVerifiedAt" />
+        <result column="password" property="password" />
+        <result column="remember_token" property="rememberToken" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="User_Base_Column_List">
+        id, mobile, email, name, email_verified_at, password, remember_token, created_at, updated_at
+    </sql>
+
+
+
+
+    <select id="getUserMember"  parameterType="int" resultMap="UserMemberResultMap" >
+            SELECT
+              `user`.id as id,
+              `user`.name as u_name,
+              `user`.email as u_email,
+              member.id as m_id,
+              member.*
+            FROM `user`
+            left join member on `user`.id = member.user_id
+            where `user`.id = #{id}
+    </select>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="UserMemberResultMap" type="com.cheng.api.dto.SysUserDto">
+        <result column="id" property="id" />
+        <result column="email" property="email" />
+        <result column="name" property="name" />
+        <result column="email_verified_at" property="emailVerifiedAt" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+
+        <association property="member" column="member_id" javaType="com.cheng.api.entity.Member">
+            <result column="m_id" property="id" jdbcType="INTEGER"/>
+            <result column="nick_name" property="nickName" jdbcType="VARCHAR"/>
+            <result column="sex" property="sex" jdbcType="INTEGER"/>
+        </association>
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, mobile, email, name, email_verified_at, password, remember_token, created_at, updated_at
+    </sql>
+
+</mapper>
+
+<!--<select id="getStudentsWithTeacher"  resultMap="StudentTeacherMap" >-->
+<!--        SELECT-->
+<!--          student.id as sid,-->
+<!--          student.name as sname,-->
+<!--          student.email as semail,-->
+<!--          teacher.id as tid,-->
+<!--          teacher.name as tname,-->
+<!--          teacher.email as temail-->
+<!--        FROM student-->
+<!--        left join teacher on teacher.id = student.teacher_id-->
+<!--    </select>-->
+
+<!--<resultMap id="StudentTeacherMap" type="Student">-->
+<!--<result column="sid" property="id" jdbcType="INTEGER"/>-->
+<!--<result column="sname" property="name" jdbcType="VARCHAR"/>-->
+<!--<result column="semail" property="email" jdbcType="VARCHAR"/>-->
+<!--<association property="teacher" column="teacher_id" javaType="Teacher">-->
+<!--    <result column="tid" property="id" jdbcType="INTEGER"/>-->
+<!--    <result column="tname" property="name" jdbcType="VARCHAR"/>-->
+<!--    <result column="temail" property="email" jdbcType="VARCHAR"/>-->
+<!--</association>-->
+<!--</resultMap>-->

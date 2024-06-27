@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cheng.api.mapper.MemberMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.cheng.api.entity.Member">
+        <id column="id" property="id" />
+<!--        <result column="mobile" property="mobile" />-->
+<!--        <result column="email" property="email" />-->
+<!--        <result column="name" property="name" />-->
+<!--        <result column="email_verified_at" property="emailVerifiedAt" />-->
+<!--        <result column="password" property="password" />-->
+<!--        <result column="remember_token" property="rememberToken" />-->
+<!--        <result column="created_at" property="createdAt" />-->
+<!--        <result column="updated_at" property="updatedAt" />-->
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+<!--    <sql id="Member_Base_Column_List">-->
+<!--        id, mobile, email, name, email_verified_at, password, remember_token, created_at, updated_at-->
+<!--    </sql>-->
+
+
+
+
+    <!--  resultMap –  是最复杂也是最强大的元素，用来描述如何从数据库结果集中来加载对象。-->
+    <resultMap id="MemberMap" type="com.cheng.api.entity.Member">
+<!--        <result column="id" property="id" jdbcType="INTEGER"/>-->
+<!--        <result column="name" property="name" jdbcType="VARCHAR"/>-->
+<!--        <result column="age" property="age" jdbcType="INTEGER"/>-->
+    </resultMap>
+
+    <select id="selectAllUser" parameterType="com.cheng.api.dto.MemberQuery" resultMap="MemberMap">
+        SELECT * FROM member as m
+        <where>
+            <if test="name != null and name != ''">
+                and `name` like concat("%",#{name},"%")
+            </if>
+        </where>
+    </select>
+
+    <select id="selectMemberById" parameterType="int" resultType="hashmap">
+        SELECT * FROM member where id = #{id}
+    </select>
+
+</mapper>
+
+
+
+
+
+
+<!--  resultMap –  是最复杂也是最强大的元素，用来描述如何从数据库结果集中来加载对象。-->
+<!--<resultMap id="StudentMap" type="Student">-->
+<!--<result column="id" property="id" jdbcType="INTEGER"/>-->
+<!--<result column="name" property="name" jdbcType="VARCHAR"/>-->
+<!--<result column="email" property="email" jdbcType="VARCHAR"/>-->
+<!--<association property="teacher" column="teacher_id" javaType="Teacher" select="getTeacherById">-->
+<!--</association>-->
+<!--</resultMap>-->
+
+<!--<select id="getStudents"  resultMap="StudentMap" >-->
+<!--        SELECT * FROM student-->
+<!--    </select>-->
+
+<!--<select id="getTeacherById"  resultType="Teacher">-->
+<!--        SELECT * FROM teacher where id = #{id}-->
+<!--    </select>-->
+
+
+
+<!--<select id="getStudentsWithTeacher"  resultMap="StudentTeacherMap" >-->
+<!--        SELECT-->
+<!--          student.id as sid,-->
+<!--          student.name as sname,-->
+<!--          student.email as semail,-->
+<!--          teacher.id as tid,-->
+<!--          teacher.name as tname,-->
+<!--          teacher.email as temail-->
+<!--        FROM student-->
+<!--        left join teacher on teacher.id = student.teacher_id-->
+<!--    </select>-->
+
+<!--<resultMap id="StudentTeacherMap" type="Student">-->
+<!--<result column="sid" property="id" jdbcType="INTEGER"/>-->
+<!--<result column="sname" property="name" jdbcType="VARCHAR"/>-->
+<!--<result column="semail" property="email" jdbcType="VARCHAR"/>-->
+<!--<association property="teacher" column="teacher_id" javaType="Teacher">-->
+<!--    <result column="tid" property="id" jdbcType="INTEGER"/>-->
+<!--    <result column="tname" property="name" jdbcType="VARCHAR"/>-->
+<!--    <result column="temail" property="email" jdbcType="VARCHAR"/>-->
+<!--</association>-->
+<!--</resultMap>-->
