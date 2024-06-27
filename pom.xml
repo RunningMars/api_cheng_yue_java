@@ -159,12 +159,6 @@
             <artifactId>hutool-all</artifactId>
             <version>5.7.20</version>
         </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
 
         <!-- 阿里云短信-->
         <dependency>

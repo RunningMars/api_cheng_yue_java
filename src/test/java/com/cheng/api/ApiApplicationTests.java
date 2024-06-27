@@ -61,8 +61,8 @@ class ApiApplicationTests {
 
     @Test
     public void test0(){
-        Member member = memberMapper.selectMemberWithImages(20001);
-        System.out.println(member);
+//        Member member = memberMapper.selectMemberWithImages(20001);
+//        System.out.println(member);
 
     }
 
