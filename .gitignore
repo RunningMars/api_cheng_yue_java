@@ -34,3 +34,7 @@ mvnw
 mvnw.cmd
 api.iml
 target
+application.properties
+application-dev.properties
+application-prod.properties
+log4j.properties
