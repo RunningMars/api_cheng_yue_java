@@ -27,6 +27,7 @@ public class SpringMvcConfig implements WebMvcConfigurer {
                     "/user/register",
                     "/user/logout",
                     "/sms/validate/send",
+                    "/webjars/**",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/doc.html",
