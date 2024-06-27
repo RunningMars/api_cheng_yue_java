@@ -49,11 +49,13 @@ public class ChatRoomServiceImpl extends ServiceImpl<ChatRoomMapper, ChatRoom> i
     @Autowired
     MemberMapper memberMapper;
 
+    @Autowired
+    ChatRoomMemberServiceImpl chatRoomMemberService;
+
     @Override
     public Page<ChatRoomDto> chatRoomList(HashMap<String,Object> params) {
         SysUserDto currentUser = UserThreadLocal.getCurrentUser();
-        System.out.println("currentUser");
-        System.out.println(currentUser);
+        System.out.println("currentUser:"+currentUser);
         // 使用 Optional 来避免深层次的 null 检查
         Optional<Integer> memberId = Optional.ofNullable(currentUser)
                 .map(SysUserDto::getMember)
@@ -135,16 +137,22 @@ public class ChatRoomServiceImpl extends ServiceImpl<ChatRoomMapper, ChatRoom> i
             chatRoomId = chatRoomMessageQuery.getChatRoomId();
         }
         ChatRoomMember chatRoomMember = chatRoomMemberMapper.selectOne(Wrappers.lambdaQuery(ChatRoomMember.class)
-                .eq(ChatRoomMember::getChatRoomId, chatRoomMessageQuery.getChatRoomId())
+                .eq(ChatRoomMember::getChatRoomId, chatRoomId)
                 .ne(ChatRoomMember::getMemberId, memberId.get())
                 .last("limit 1"));
+
         if (chatRoomMember != null){
             Member member = memberMapper.selectById(chatRoomMember.getMemberId());
             MemberVo memberVo = new MemberVo(member);
             returnMap.put("toMember",memberVo);
         }
+        ChatRoomMember chatRoomMember1 = new ChatRoomMember();
+        chatRoomMember1.setIsNewToRead(false);
+        chatRoomMemberService.update(chatRoomMember1,Wrappers.lambdaQuery(ChatRoomMember.class)
+                .eq(ChatRoomMember::getMemberId,memberId.get())
+                .eq(ChatRoomMember::getChatRoomId,chatRoomId));
         Page<ChatRoomMessage> pageInfo = new Page<>(chatRoomMessageQuery.getPageNum(),chatRoomMessageQuery.getPageSize());
-        Page<ChatRoomMessageDto> chatRoomMessageList = chatRoomMessageMapper.getMessageByChatRoomId(pageInfo, chatRoomMessageQuery.getChatRoomId());
+        Page<ChatRoomMessageDto> chatRoomMessageList = chatRoomMessageMapper.getMessageByChatRoomId(pageInfo, chatRoomId);
         Collections.reverse(chatRoomMessageList.getRecords());
 
         returnMap.put("data",chatRoomMessageList);
