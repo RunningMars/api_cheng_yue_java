@@ -18,7 +18,9 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         //放行哪些原始域
         config.addAllowedOrigin("http://localhost:8080");
+        config.addAllowedOrigin("http://localhost:8090");
         config.addAllowedOrigin("http://localhost");
+        config.addAllowedOrigin("8.137.16.60");
         //config.addAllowedOrigin("http://cheng_yue.com");
         //是否发送 Cookie
         config.setAllowCredentials(true);
