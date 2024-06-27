@@ -21,6 +21,7 @@ public class SpringMvcConfig implements WebMvcConfigurer {
                 //允许直接访问的路径
                 .excludePathPatterns(
                     "/error",
+                    "/index",
                     "/uploadImage",
                     "/user/login",
                     "/user/register",

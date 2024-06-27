@@ -3,6 +3,8 @@ package com.cheng.api.controller;
 import com.cheng.api.util.ConfigUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class IndexController {
@@ -17,6 +19,12 @@ public class IndexController {
         System.out.println("well done finish");
     }
 
+
+    @RequestMapping("/index")
+    @ResponseBody
+    public String index(){
+        return "welcome springboot";
+    }
 
     public void test2(){
         System.out.println("well done!");
