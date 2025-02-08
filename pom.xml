@@ -92,7 +92,7 @@
             <version>2.3.30</version>
         </dependency>
 
-            <!-- 添加 Velocity 依赖 , mybatis 代码生成器 使用 -->
+        <!-- 添加 Velocity 依赖 , mybatis 代码生成器 使用 -->
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
@@ -172,6 +172,13 @@
             <artifactId>aliyun-sdk-oss</artifactId>
             <version>3.6.0</version>
         </dependency>
+        <!--gateway_service加密加签名-->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.70</version>
+        </dependency>
+
 
     </dependencies>
 

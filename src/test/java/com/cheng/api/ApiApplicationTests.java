@@ -1,23 +1,20 @@
 package com.cheng.api;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.toolkit.SimpleQuery;
-import com.cheng.api.common.R;
-import com.cheng.api.entity.Member;
-import com.cheng.api.entity.MemberImage;
 import com.cheng.api.mapper.MemberImageMapper;
 import com.cheng.api.mapper.MemberMapper;
 import com.cheng.api.service.MemberImageServiceI;
 import com.cheng.api.service.MemberServiceI;
-import com.cheng.api.util.JwtUtil;
-import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.crypto.Cipher;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
 @SpringBootTest
@@ -234,4 +231,123 @@ class ApiApplicationTests {
 //    }
 
 
+
+    private static final int SPLIT_LENGTH = 244;
+    private static final String PUBLIC_KEY_PEM = "-----BEGIN PUBLIC KEY-----\n" +
+            "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1WGg5oL31tLGzq8r9qVY\n" +
+            "oKZKIMv6SIJSTajVWren7gffEf43+Ua4E8oBC1rBarzfUt79M75zBMYhburkJ6X/\n" +
+            "5k4dEwnW/h8UB2ZM00nDIp77tEidDDgr3nDQfInwV9AakRq5jgEA7hj7r/MH2mRW\n" +
+            "975P1t0YTSrJttQb1is9LTkiIeXiz+qeGZe4E7Jt/gk3aSey1XYW4rwUakdFsnC1\n" +
+            "td0UyvxyJiWSQTfU5Bs4Bh6P+4lZCC/XZQ447Bb2UoJZjt/B3o9VJMGjXhdkntzL\n" +
+            "t1Ez+TIeKe6M2boGPbswF8uIQBcpgxnB9PNAAoZTijGmWgv5NvlDxDnRqTiUJulF\n" +
+            "qwIDAQAB\n" +
+            "-----END PUBLIC KEY-----";
+
+    public String encrypt(String rawString) throws Exception {
+        PublicKey publicKey = loadPublicKey(PUBLIC_KEY_PEM);
+        List<String> rawArr = splitString(rawString, SPLIT_LENGTH);
+        List<String> encryptArr = new ArrayList<>();
+
+        for (String raw : rawArr) {
+            byte[] encryptedBytes = encryptWithPublicKey(raw.getBytes(StandardCharsets.UTF_8), publicKey);
+            encryptArr.add(Base64.getEncoder().encodeToString(encryptedBytes));
+        }
+
+        return String.join("::", encryptArr);
+    }
+
+    private PublicKey loadPublicKey(String publicKeyPEM) throws Exception {
+        String publicKeyPEMFormatted = publicKeyPEM
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll("\\s+", "");
+
+        byte[] encoded = Base64.getDecoder().decode(publicKeyPEMFormatted);
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        return keyFactory.generatePublic(keySpec);
+    }
+
+    private List<String> splitString(String input, int length) {
+        List<String> parts = new ArrayList<>();
+        int index = 0;
+        while (index < input.length()) {
+            parts.add(input.substring(index, Math.min(index + length, input.length())));
+            index += length;
+        }
+        return parts;
+    }
+
+    private byte[] encryptWithPublicKey(byte[] data, PublicKey publicKey) throws Exception {
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        return cipher.doFinal(data);
+    }
+
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    public String generateSignature(String appId, String appKey, long timestamp, String nonce) throws Exception {
+        String originalString = appId + appKey + timestamp + nonce;
+        System.out.println("originalString");
+        System.out.println(originalString);
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(originalString.getBytes());
+            String sha256hex = bytesToHex(encodedhash);
+            return sha256hex;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    @Test
+    public void testRequest() {
+        try {
+            HashMap<String,Object> parameters = new HashMap<String,Object>();
+            parameters.put("EMDM_location_id","2bfd5f85-abb1-41e1-920e-f69374604587");
+            ArrayList<String> strings = new ArrayList<>();
+            strings.add("HV111");
+            parameters.put("number", strings);
+
+            String encryptedRequestString = encrypt(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(parameters));
+            String appId = "DKMJwBzQ6uH9hEgxJLWT";
+            String appKey = "HDfOr6RFt9ZTPJc7iNIC";
+            long timestamp = System.currentTimeMillis() / 1000;
+            String nonce = "de208ae41b98a";
+            String signature = generateSignature(appId, appKey, timestamp, nonce);
+
+            Map<String, Object> headers = new HashMap<>();
+            headers.put("G-Provider", appId);
+            headers.put("G-Timestamp", timestamp);
+            headers.put("G-Nonce", nonce);
+            headers.put("G-Signature", signature);
+
+            Map<String, Object> request = new HashMap<>();
+            request.put("request", encryptedRequestString);
+            System.out.println("headers");
+            System.out.println(headers);
+            System.out.println("request");
+            System.out.println(request);
+            //return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            //return ResponseEntity.status(500).body(null);
+        }
+    }
+
 }
+
+
